@@ -73,6 +73,11 @@ jobs:
           "$RUNNER_TEMP/mac-click" 733 284
           sleep 2
           screencapture -x evidence/utility-quick-panel.png
+          "$RUNNER_TEMP/mac-click" 330 56
+          sleep 1
+          open -a "$RUNNER_TEMP/Vorssaint.app"
+          sleep 2
+          screencapture -x evidence/reopened-panel.png
           "$RUNNER_TEMP/mac-click" 849 121
           sleep 1
           "$RUNNER_TEMP/mac-scroll" 886 510 -720
