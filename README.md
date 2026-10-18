@@ -4,8 +4,8 @@ Bu küçük depo, GitHub Actions `macos-15` (M1) üzerinde resmi Vorssaint 3.4.1
 
 ## Çalıştırma
 
-1. Bu klasörü ayrı bir **herkese açık** GitHub deposuna yükle. Büyük Windows ZIP'ini veya kişisel dosyaları ekleme.
-2. Depoda **Actions → Vorssaint macOS evidence → Run workflow** seç.
-3. İş bitince artifact ZIP'ini indir. `panel-screen.png`, `windows.tsv` ve varsa `panel-rea.json` dosyalarını Windows portuyla karşılaştır.
+1. [Actions → Vorssaint macOS evidence](https://github.com/hannullsec/vorssaint-macos-probe-20261018/actions/workflows/probe.yml) sayfasında **Run workflow** seç.
+2. İş bitince `vorssaint-macos-evidence` artifact'ini indir. `tab-0-awake.png` ile `tab-8-about.png` arasındaki dokuz ekran görüntüsü panelin gerçek sekmelerini gösterir.
+3. `app.json` ve `dmg.json` REA paket incelemeleridir. `panel-rea.json` içindeki `window-mismatch` hatası native UI çağrısının başarılı olmadığını gösterir; ekran görüntüleri ayrı macOS çalışma zamanı kanıtıdır.
 
-İş akışı henüz gerçek bir GitHub Mac çalıştırıcısında denenmedi; ilk koşuda açılış/onboarding veya izin davranışı nedeniyle panel görüntüsü alınamazsa workflow log'u ve artifact'e göre düzeltilecek. Çalıştırıcı geçicidir: uzak masaüstü olarak kalıcı bir Mac sağlamaz.
+İş akışı 2026-10-18'de [39085410819 numaralı M1 koşusunda](https://github.com/hannullsec/vorssaint-macos-probe-20261018/actions/runs/39085410819) başarıyla çalıştı. macOS ekran yakalaması sırasında güncelleme tanıtım penceresi panelin arkasında kaldı. Çalıştırıcı geçicidir: uzak masaüstü olarak kalıcı bir Mac sağlamaz.
