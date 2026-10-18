@@ -28,7 +28,6 @@ jobs:
           ditto "$RUNNER_TEMP/vorssaint-mount/Vorssaint.app" "$RUNNER_TEMP/Vorssaint.app"
           hdiutil detach "$RUNNER_TEMP/vorssaint-mount"
           codesign --verify --deep --strict "$RUNNER_TEMP/Vorssaint.app"
-          npx -y rea-agents@6.5.0 --help > /dev/null
 
       - name: Launch original app and reopen its panel
         shell: bash
@@ -46,22 +45,6 @@ jobs:
           pid="$(pgrep -x Vorssaint | head -n 1 || true)"
           if [ -n "$pid" ]; then
             swift research/mac_windows.swift "$pid" > evidence/windows.tsv
-          fi
-
-      - name: Observe active original panel with REA
-        shell: bash
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          pid="$(pgrep -x Vorssaint | head -n 1 || true)"
-          if [ -n "$pid" ]; then
-            swift research/mac_windows.swift "$pid" > evidence/windows-rea.tsv
-            window_id="$(awk '/\(layer 25\)/ { print $1; exit }' evidence/windows-rea.tsv || true)"
-            if [ -n "$window_id" ]; then
-              npx -y rea-agents@6.5.0 observe-native-ui "$RUNNER_TEMP/Vorssaint.app" \
-                --pid "$pid" --window-id "$window_id" --screenshot --accessibility --format json \
-                > evidence/panel-rea.json
-            fi
           fi
 
       - name: Capture each original panel tab
