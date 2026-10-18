@@ -116,6 +116,16 @@ jobs:
           "$RUNNER_TEMP/mac-click" 342 665
           sleep 1
           screencapture -x evidence/dynamic-island-section-665.png
+          "$RUNNER_TEMP/mac-click" 99 635
+          sleep 2
+          screencapture -x evidence/radial-settings.png
+          "$RUNNER_TEMP/mac-click" 707 355
+          sleep 2
+          screencapture -x evidence/radial-preview-attempt.png
+          pid="$(pgrep -x Vorssaint | head -n 1 || true)"
+          if [ -n "$pid" ]; then
+            swift research/mac_windows.swift "$pid" > evidence/windows-radial.tsv
+          fi
           pid="$(pgrep -x Vorssaint | head -n 1 || true)"
           if [ -n "$pid" ]; then
             swift research/mac_windows.swift "$pid" > evidence/windows-after-settings.tsv
