@@ -83,9 +83,18 @@ jobs:
           "$RUNNER_TEMP/mac-scroll" 886 510 -720
           sleep 1
           screencapture -x evidence/utility-scrolled.png
+          "$RUNNER_TEMP/mac-scroll" 886 510 -360
+          sleep 1
+          screencapture -x evidence/utility-bottom.png
           "$RUNNER_TEMP/mac-click" 704 655
           sleep 3
           screencapture -x evidence/settings-initial.png
+          "$RUNNER_TEMP/mac-click" 738 664
+          sleep 2
+          screencapture -x evidence/settings-uncovered.png
+          "$RUNNER_TEMP/mac-click" 181 264
+          sleep 2
+          screencapture -x evidence/dynamic-island-settings.png
           pid="$(pgrep -x Vorssaint | head -n 1 || true)"
           if [ -n "$pid" ]; then
             swift research/mac_windows.swift "$pid" > evidence/windows-after-settings.tsv
