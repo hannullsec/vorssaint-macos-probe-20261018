@@ -69,7 +69,7 @@ jobs:
           npx -y rea-agents@6.5.0 inspect-artifact "$RUNNER_TEMP/Vorssaint-3.4.1.dmg" --format json > evidence/dmg.json
           npx -y rea-agents@6.5.0 inspect-artifact "$RUNNER_TEMP/Vorssaint.app" --format json > evidence/app.json
           pid="$(pgrep -x Vorssaint | head -n 1 || true)"
-          window_id="$(awk 'NR == 1 { print $1 }' evidence/windows.tsv 2>/dev/null || true)"
+          window_id="$(awk '/\(layer 25\)/ { print $1; exit }' evidence/windows.tsv 2>/dev/null || true)"
           if [ -n "$pid" ] && [ -n "$window_id" ]; then
             npx -y rea-agents@6.5.0 observe-native-ui "$RUNNER_TEMP/Vorssaint.app" \
               --pid "$pid" --window-id "$window_id" --screenshot --accessibility --format json \
