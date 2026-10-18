@@ -1,0 +1,71 @@
+name: Vorssaint macOS evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download and verify original app
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence "$RUNNER_TEMP/vorssaint-mount"
+          uname -m > evidence/architecture.txt
+          sw_vers > evidence/macos.txt
+          curl --fail --location --retry 3 \
+            'https://github.com/vorssaint/vorssaint-utils/releases/download/v3.4.1/Vorssaint-3.4.1.dmg' \
+            --output "$RUNNER_TEMP/Vorssaint-3.4.1.dmg"
+          echo 'd3cebdd07795826294d821946cb1d40f5e8b85d2883a81153c552046cc80ab3a  '"$RUNNER_TEMP/Vorssaint-3.4.1.dmg" | shasum -a 256 --check
+          hdiutil attach -readonly -nobrowse -mountpoint "$RUNNER_TEMP/vorssaint-mount" "$RUNNER_TEMP/Vorssaint-3.4.1.dmg"
+          ditto "$RUNNER_TEMP/vorssaint-mount/Vorssaint.app" "$RUNNER_TEMP/Vorssaint.app"
+          hdiutil detach "$RUNNER_TEMP/vorssaint-mount"
+          codesign --verify --deep --strict "$RUNNER_TEMP/Vorssaint.app"
+
+      - name: Launch original app and reopen its panel
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          defaults write com.vorssaint.utils hasOnboarded -bool true
+          defaults write com.vorssaint.utils lastUpdateIntroVersion '3.4.1'
+          open -a "$RUNNER_TEMP/Vorssaint.app"
+          sleep 8
+          open -a "$RUNNER_TEMP/Vorssaint.app"
+          sleep 5
+          pgrep -fl Vorssaint > evidence/processes.txt || true
+          screencapture -x evidence/panel-screen.png
+          pid="$(pgrep -x Vorssaint | head -n 1 || true)"
+          if [ -n "$pid" ]; then
+            swift research/mac_windows.swift "$pid" > evidence/windows.tsv
+          fi
+
+      - name: Inspect original app with REA
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          npx -y rea-agents@6.5.0 inspect-artifact "$RUNNER_TEMP/Vorssaint-3.4.1.dmg" --format json > evidence/dmg.json
+          npx -y rea-agents@6.5.0 inspect-artifact "$RUNNER_TEMP/Vorssaint.app" --format json > evidence/app.json
+          pid="$(pgrep -x Vorssaint | head -n 1 || true)"
+          window_id="$(awk 'NR == 1 { print $1 }' evidence/windows.tsv 2>/dev/null || true)"
+          if [ -n "$pid" ] && [ -n "$window_id" ]; then
+            npx -y rea-agents@6.5.0 observe-native-ui "$RUNNER_TEMP/Vorssaint.app" \
+              --pid "$pid" --window-id "$window_id" --screenshot --accessibility --format json \
+              > evidence/panel-rea.json
+          fi
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vorssaint-macos-evidence
+          path: evidence/
+          if-no-files-found: warn
