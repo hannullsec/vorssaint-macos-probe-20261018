@@ -47,6 +47,20 @@ jobs:
             swift research/mac_windows.swift "$pid" > evidence/windows.tsv
           fi
 
+      - name: Capture each original panel tab
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          swiftc research/mac_click.swift -o "$RUNNER_TEMP/mac-click"
+          tabs=(awake audio system network storage energy tools controls about)
+          xs=(651 684 717 750 783 816 849 882 915)
+          for i in "${!tabs[@]}"; do
+            "$RUNNER_TEMP/mac-click" "${xs[$i]}" 121
+            sleep 1
+            screencapture -x "evidence/tab-${i}-${tabs[$i]}.png"
+          done
+
       - name: Inspect original app with REA
         shell: bash
         continue-on-error: true
