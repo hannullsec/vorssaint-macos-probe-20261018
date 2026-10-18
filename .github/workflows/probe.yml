@@ -86,6 +86,12 @@ jobs:
           npx -y rea-agents@6.5.0 inspect-artifact "$RUNNER_TEMP/Vorssaint-3.4.1.dmg" --format json > evidence/dmg.json
           npx -y rea-agents@6.5.0 inspect-artifact "$RUNNER_TEMP/Vorssaint.app" --format json > evidence/app.json
 
+      - name: Inspect original Mach-O with REA
+        shell: bash
+        continue-on-error: true
+        run: |
+          npx -y rea-agents@6.5.0 inspect-macho "$RUNNER_TEMP/Vorssaint.app/Contents/MacOS/Vorssaint" --format json > evidence/macho.json
+
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
