@@ -61,6 +61,31 @@ jobs:
             screencapture -x "evidence/tab-${i}-${tabs[$i]}.png"
           done
 
+      - name: Capture original utility navigation and settings
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          swiftc research/mac_scroll.swift -o "$RUNNER_TEMP/mac-scroll"
+          "$RUNNER_TEMP/mac-click" 849 121
+          sleep 1
+          screencapture -x evidence/utility-initial.png
+          "$RUNNER_TEMP/mac-click" 733 284
+          sleep 2
+          screencapture -x evidence/utility-quick-panel.png
+          "$RUNNER_TEMP/mac-click" 849 121
+          sleep 1
+          "$RUNNER_TEMP/mac-scroll" 886 510 -720
+          sleep 1
+          screencapture -x evidence/utility-scrolled.png
+          "$RUNNER_TEMP/mac-click" 704 655
+          sleep 3
+          screencapture -x evidence/settings-initial.png
+          pid="$(pgrep -x Vorssaint | head -n 1 || true)"
+          if [ -n "$pid" ]; then
+            swift research/mac_windows.swift "$pid" > evidence/windows-after-settings.tsv
+          fi
+
       - name: Inspect original app with REA
         shell: bash
         continue-on-error: true
