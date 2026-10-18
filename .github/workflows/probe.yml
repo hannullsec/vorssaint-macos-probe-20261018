@@ -122,6 +122,9 @@ jobs:
           "$RUNNER_TEMP/mac-click" 707 355
           sleep 2
           screencapture -x evidence/radial-preview-attempt.png
+          "$RUNNER_TEMP/mac-click" 284 366
+          sleep 2
+          screencapture -x evidence/radial-preview.png
           pid="$(pgrep -x Vorssaint | head -n 1 || true)"
           if [ -n "$pid" ]; then
             swift research/mac_windows.swift "$pid" > evidence/windows-radial.tsv
